@@ -19,7 +19,9 @@ namespace PokemonReviewApp.Repository
 
         public bool CreateCategory(Category category)
         {
-            // Change Tracker
+            _context.Add(category);
+
+            return Save();
         }
 
         public ICollection<Category> GetCategories()
@@ -39,7 +41,9 @@ namespace PokemonReviewApp.Repository
 
         public bool Save()
         {
-            throw new NotImplementedException();
+            var saved = _context.SaveChanges();
+
+            return saved > 0 ? true : false;
         }
     }
 }
