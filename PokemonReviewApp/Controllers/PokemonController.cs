@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using PokemonReviewApp.Repository;
 
 namespace PokemonReviewApp.Controllers
 {
@@ -37,7 +38,7 @@ namespace PokemonReviewApp.Controllers
 
         public IActionResult GetPokemon(int pokeId)
         {
-            if (!_pokemonRepository.PokemonExists(pokeId)) 
+            if (!_pokemonRepository.PokemonExists(pokeId))
                 return NotFound();
 
             var pokemons = _mapper.Map<PokemonDto>(_pokemonRepository.GetPokemon(pokeId));
@@ -52,10 +53,10 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(200, Type = typeof(decimal))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetPokemonRating(int pokeId) 
+        public IActionResult GetPokemonRating(int pokeId)
         {
             if (!_pokemonRepository.PokemonExists(pokeId))
-            return NotFound();
+                return NotFound();
 
             var ratings = _pokemonRepository.GetPokemonRating(pokeId);
 
@@ -63,6 +64,40 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(ModelState);
 
             return Ok(ratings);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(204)]
+
+        public IActionResult CreatePokemon([FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto pokemonCreate)
+        {
+            if (pokemonCreate == null)
+                return BadRequest(ModelState);
+
+            var pokemon = _pokemonRepository.GetPokemons()
+                .Where(c => c.Name.Trim().ToUpper() == pokemonCreate.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
+
+            if (pokemon != null)
+            {
+                ModelState.AddModelError("", "Pokemon already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var pokemonMap = _mapper.Map<Pokemon>(pokemonCreate);
+
+
+            if (!_pokemonRepository.CreatePokemon(ownerId, catId, pokemonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
         }
     }
 }
