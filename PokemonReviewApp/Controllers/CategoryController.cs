@@ -85,7 +85,7 @@ namespace PokemonReviewApp.Controllers
             if (!ModelState.IsValid) 
                 return BadRequest(ModelState);
 
-            var categoryMap = _mapper.Map<Category>(categoryCreate);
+            var categoryMap = _mapper.Map<Category> (categoryCreate);
 
             if (!_categoryRepository.CreateCategory(categoryMap))
             {
