@@ -66,7 +66,7 @@ namespace PokemonReviewApp.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
 
         public IActionResult CreateCountry([FromBody] CountryDto countryCreate)
         { 

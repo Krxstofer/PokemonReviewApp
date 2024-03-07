@@ -68,7 +68,7 @@ namespace PokemonReviewApp.Controllers
 
         [HttpPost]
         [ProducesResponseType(204)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
 
         public IActionResult CreatePokemon([FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto pokemonCreate)
         {
