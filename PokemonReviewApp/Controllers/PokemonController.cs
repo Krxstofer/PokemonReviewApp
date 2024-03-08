@@ -70,7 +70,8 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
 
-        public IActionResult CreatePokemon([FromQuery] int ownerId, [FromQuery] int catId, [FromBody] PokemonDto pokemonCreate)
+        public IActionResult CreatePokemon([FromQuery] int ownerId, 
+            [FromQuery] int catId, [FromBody] PokemonDto pokemonCreate)
         {
             if (pokemonCreate == null)
                 return BadRequest(ModelState);
