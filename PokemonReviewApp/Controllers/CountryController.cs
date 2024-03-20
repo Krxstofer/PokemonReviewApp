@@ -22,7 +22,7 @@ namespace PokemonReviewApp.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
-        
+
         public IActionResult GetCountries()
         {
             var countries = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
@@ -54,7 +54,7 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(200, Type = typeof(Country))]
 
-        public IActionResult GetCountryByAOwner(int ownerId) 
+        public IActionResult GetCountryByAOwner(int ownerId)
         {
             var country = _mapper.Map<CountryDto>(_countryRepository.GetCountrybyOwner(ownerId));
 
@@ -69,8 +69,8 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(400)]
 
         public IActionResult CreateCountry([FromBody] CountryDto countryCreate)
-        { 
-            if(countryCreate == null)
+        {
+            if (countryCreate == null)
                 return BadRequest(ModelState);
 
             var country = _countryRepository.GetCountries()
@@ -83,7 +83,7 @@ namespace PokemonReviewApp.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var countryMap = _mapper.Map<Country>(countryCreate);
@@ -125,6 +125,33 @@ namespace PokemonReviewApp.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpDelete("{countryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+
+        public IActionResult DeleteCountry(int countryId) 
+        {
+            if (!_countryRepository.CountryExists(countryId))
+            {
+                return NotFound();
+            }
+
+            var countryToDelete = _countryRepository.GetCountry(countryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_countryRepository.DeleteCountry(countryToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting Country");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+
         }
     }
 }
