@@ -138,13 +138,13 @@ namespace PokemonReviewApp.Controllers
                 return NotFound();
             }
 
-            var deleteCategory = _categoryRepository.GetCategory(categoryId);
+            var categoryToDelete = _categoryRepository.GetCategory(categoryId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
 
-            if (!_categoryRepository.DeleteCategory(deleteCategory))
+            if (!_categoryRepository.DeleteCategory(categoryToDelete))
             {
                 ModelState.AddModelError("", "Something went wrong deleting category");
                     return StatusCode(500, ModelState);
