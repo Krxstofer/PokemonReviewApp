@@ -38,7 +38,12 @@ namespace PokemonReviewApp.Repository
             _context.Add(pokemon);
 
             return Save();
+        }
 
+        public bool DeletePokemon(int ownerId, int categoryId, Pokemon pokemon)
+        {
+            _context.Remove(pokemon);
+            return Save();
         }
 
         public Pokemon GetPokemon(int id)
