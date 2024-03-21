@@ -16,7 +16,7 @@ namespace PokemonReviewApp.Controllers
         private readonly IReviewerRepository _reviewerRepository;
         private readonly IMapper _mapper;
 
-        public ReviewController(IReviewRepository reviewRepository,IPokemonRepository pokemonRepository, IReviewerRepository reviewerRepository, IMapper mapper)
+        public ReviewController(IReviewRepository reviewRepository, IPokemonRepository pokemonRepository, IReviewerRepository reviewerRepository, IMapper mapper)
         {
             _reviewRepository = reviewRepository;
             _pokemonRepository = pokemonRepository;
@@ -26,7 +26,7 @@ namespace PokemonReviewApp.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Review>))]
-        public IActionResult GetReviews() 
+        public IActionResult GetReviews()
         {
             var reviews = _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviews());
 
@@ -40,7 +40,7 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(200, Type = typeof(Review))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetReview(int reviewId) 
+        public IActionResult GetReview(int reviewId)
         {
             if (!_reviewRepository.ReviewExists(reviewId))
                 return NotFound();
@@ -57,14 +57,14 @@ namespace PokemonReviewApp.Controllers
         [ProducesResponseType(200, Type = typeof(Review))]
         [ProducesResponseType(400)]
 
-        public IActionResult GetReviewsForAPokemon(int pokeId) 
+        public IActionResult GetReviewsForAPokemon(int pokeId)
         {
             var reviews = _mapper.Map<List<ReviewDto>>(_reviewRepository.GetReviewsForAPokemon(pokeId));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(reviews); 
+            return Ok(reviews);
         }
 
         [HttpPost]
@@ -90,10 +90,10 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var reviewMap = _mapper.Map<Review>(reviewCreate);
-            
+
             reviewMap.Pokemon = _pokemonRepository.GetPokemon(pokeId);
 
-            reviewMap.Reviewer = _reviewerRepository.GetReviewer(reviewerId); 
+            reviewMap.Reviewer = _reviewerRepository.GetReviewer(reviewerId);
 
 
             if (!_reviewRepository.CreateReview(reviewMap))
@@ -136,5 +136,31 @@ namespace PokemonReviewApp.Controllers
 
         }
 
+        [HttpDelete("{reviewId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+
+        public IActionResult DeleteReview(int reviewId) 
+        {
+            if (!_reviewRepository.ReviewExists(reviewId))
+            {
+                return NotFound();
+            }
+
+            var reviewToDelete = _reviewRepository.GetReview(reviewId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.DeleteReview(reviewToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting Review");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+
+        }
     }
 }
