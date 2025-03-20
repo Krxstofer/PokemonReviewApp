@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using PokemonReviewApp;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
@@ -8,10 +9,9 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddTransient<Seed>();
-builder.Services.AddControllers().AddJsonOptions(x => 
+builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
@@ -20,27 +20,41 @@ builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewerRepository, ReviewerRepository>();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Use In-Memory Database
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseInMemoryDatabase("PokemonDb");
+});
+
+// Swagger Configuration
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Pokemon Review API",
+        Version = "v1",
+        Description = "API for managing Pokemon reviews"
+    });
 });
 
 var app = builder.Build();
 
-if (args.Length == 1 && args[0].ToLower() == "seeddata")
-    SeedData(app);
+// Ensure database is seeded
+SeedData(app);
 
 void SeedData(IHost app)
 {
-    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
-
-    using (var scope = scopedFactory.CreateScope())
+    using (var scope = app.Services.CreateScope())
     {
-        var service = scope.ServiceProvider.GetService<Seed>();
-        service.SeedDataContext();
+        var serviceProvider = scope.ServiceProvider;
+        var context = serviceProvider.GetRequiredService<DataContext>();
+
+        context.Database.EnsureCreated(); // Ensure the in-memory DB is created
+
+        var seed = serviceProvider.GetRequiredService<Seed>();
+        seed.SeedDataContext(); // Populate database
     }
 }
 
@@ -48,7 +62,7 @@ void SeedData(IHost app)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pokemon Review API v1"));
 }
 
 app.UseHttpsRedirection();
