@@ -31,12 +31,6 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Pokemon Review API",
-        Version = "v1",
-        Description = "API for managing Pokemon reviews"
-    });
 });
 
 var app = builder.Build();
