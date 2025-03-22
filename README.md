@@ -85,7 +85,3 @@ http://localhost:<port>/swagger/index.html
 ## ✅ Contributing
 Feel free to **fork** this repo, **open issues**, and **submit PRs**. Suggestions and improvements are welcome!
 
-## 📄 License
-This project is licensed under the **MIT License**.
-
-
