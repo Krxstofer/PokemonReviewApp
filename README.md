@@ -13,7 +13,7 @@ The **Pokemon Review API** is a RESTful API built with **ASP.NET Core** and **En
 ## 📂 Project Structure
 ```
 PokemonReviewApp/
-│── Controllers/        # API Controllers
+│── Controllers/       # API Controllers
 │── Data/              # Entity Framework DbContext
 │── Dto/               # Data Transfer Objects
 │── Interfaces/        # Repository Interfaces
